@@ -6,12 +6,20 @@ body {
     background-color: #f9f9f9;
     color: #333;
 }
-
+footer{
+    background-color: black;
+    padding: 10px;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
 header {
     background-color: #6200ea;
     color: white;
     text-align: center;
     padding: 1rem 0;
+    justify-content: center;
+
 }
 
 h1 {
@@ -23,6 +31,7 @@ main {
     padding: 1rem;
     max-width: 600px;
     margin: 0 auto;
+    height: 100vh;
 }
 
 .task-input,
@@ -31,7 +40,11 @@ main {
     justify-content: space-between;
     margin-bottom: 1rem;
 }
-
+.task-search{
+    width: 50%;
+    justify-content: center;
+    margin: auto auto;
+}
 #taskInput,
 #searchInput {
     flex: 1;
@@ -114,4 +127,7 @@ main {
 
 .task-list li.editing span {
     display: none;
+}
+.org{
+    font-size: small;
 }
