@@ -1,30 +1,66 @@
+
 document.addEventListener("DOMContentLoaded", () => {
     const taskInput = document.getElementById("taskInput");
+    const dateInput = document.getElementById("dateInput");
     const addTaskBtn = document.getElementById("addTaskBtn");
-    const taskList = document.getElementById("taskList");
+
+    const pendingTasks = document.getElementById("pendingTasks");
+    const completedTasks = document.getElementById("completedTasks");
+    const overdueTasks = document.getElementById("overdueTasks");
+
     const searchInput = document.getElementById("searchInput");
+    const pendingCount = document.getElementById("pendingCount");
+    const completedCount = document.getElementById("completedCount");
+    const overdueCount = document.getElementById("overdueCount");
+
+    // Função para exibir mensagens temporárias
+    function showMessage(message, type = "success") {
+        const messageBox = document.createElement("div");
+        messageBox.className = `message-box ${type}`;
+        messageBox.textContent = message;
+
+        document.body.appendChild(messageBox);
+
+        setTimeout(() => {
+            messageBox.remove();
+        }, 3000);
+    }
+
+    // Atualizar contadores
+    function updateCounters() {
+        pendingCount.textContent = pendingTasks.children.length;
+        completedCount.textContent = completedTasks.children.length;
+        overdueCount.textContent = overdueTasks.children.length;
+    }
 
     // Adicionar tarefa
     addTaskBtn.addEventListener("click", () => {
         const taskText = taskInput.value.trim();
+        const taskDate = dateInput.value;
 
-        if (taskText === "") {
-            alert("Por favor, insira uma tarefa.");
+        if (!taskText || !taskDate) {
+            alert("Por favor, preencha a tarefa e a data/hora.");
             return;
         }
 
-        createTask(taskText);
+        createTask(taskText, taskDate);
+
+        // Mensagem de sucesso
+        showMessage(`Tarefa "${taskText}" adicionada com sucesso!`);
+
         taskInput.value = "";
+        dateInput.value = "";
         taskInput.focus();
     });
 
     // Criar elemento de tarefa
-    function createTask(taskText) {
+    function createTask(taskText, taskDate) {
         const taskItem = document.createElement("li");
 
         taskItem.innerHTML = `
             <input type="checkbox" class="task-checkbox" />
             <span>${taskText}</span>
+            <span class="task-date">${taskDate}</span>
             <input type="text" class="edit-task" value="${taskText}" />
             <button class="edit-btn">Editar</button>
             <button class="save-btn" style="display:none;">Salvar</button>
@@ -33,18 +69,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Remover tarefa
         taskItem.querySelector(".remove-btn").addEventListener("click", () => {
-            taskList.removeChild(taskItem);
+            const confirmed = confirm(`Tem certeza de que deseja remover a tarefa "${taskText}"?`);
+            if (confirmed) {
+                taskItem.remove();
+                updateCounters();
+            }
         });
 
         // Marcar/desmarcar como concluída
         taskItem.querySelector(".task-checkbox").addEventListener("change", (event) => {
             if (event.target.checked) {
                 taskItem.classList.add("completed");
-                taskList.appendChild(taskItem); // Manda para o fim
+                taskItem.classList.remove("overdue");
+                completedTasks.appendChild(taskItem);
             } else {
                 taskItem.classList.remove("completed");
-                taskList.prepend(taskItem); // Manda para o início
+                pendingTasks.appendChild(taskItem);
             }
+            updateCounters();
         });
 
         // Editar tarefa
@@ -54,10 +96,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const taskTextSpan = taskItem.querySelector("span");
 
         editBtn.addEventListener("click", () => {
-            taskItem.classList.add("editing");
-            editInput.focus();
-            editBtn.style.display = "none";
-            saveBtn.style.display = "inline-block";
+            const confirmed = confirm(`Tem certeza de que deseja editar a tarefa "${taskText}"?`);
+            if (confirmed) {
+                taskItem.classList.add("editing");
+                editInput.focus();
+                editBtn.style.display = "none";
+                saveBtn.style.display = "inline-block";
+            }
         });
 
         // Salvar edição
@@ -82,15 +127,46 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        taskList.prepend(taskItem); // Adiciona no início da lista
+        pendingTasks.appendChild(taskItem);
+        updateCounters();
+
+        // Monitorar tempo da tarefa individualmente
+        monitorTaskTime(taskItem, taskDate);
+    }
+
+    // Monitorar tempo da tarefa
+    function monitorTaskTime(taskItem, taskDate) {
+        const taskTime = new Date(taskDate).getTime();
+
+        const checkTime = () => {
+            const now = Date.now();
+
+            if (!taskItem.classList.contains("completed")) {
+                if (taskTime <= now) {
+                    if (!taskItem.classList.contains("overdue")) {
+                        alert(`A tarefa "${taskItem.querySelector("span").textContent}" está atrasada ou na hora de execução!`);
+                    }
+                    taskItem.classList.add("overdue");
+                    overdueTasks.appendChild(taskItem);
+                } else {
+                    taskItem.classList.remove("overdue");
+                    pendingTasks.appendChild(taskItem);
+                }
+                updateCounters();
+            }
+        };
+
+        // Checar imediatamente e a cada minuto
+        checkTime();
+        setInterval(checkTime, 60000);
     }
 
     // Pesquisa de tarefas
     searchInput.addEventListener("input", () => {
         const query = searchInput.value.toLowerCase();
-        const tasks = Array.from(taskList.children);
+        const allTasks = [...pendingTasks.children, ...completedTasks.children, ...overdueTasks.children];
 
-        tasks.forEach(task => {
+        allTasks.forEach(task => {
             const taskText = task.querySelector("span").textContent.toLowerCase();
             if (taskText.includes(query)) {
                 task.style.display = "flex";

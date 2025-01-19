@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    
     <header>
-        <h1>Gerenciador de Tarefas | <p class="org"> Organize suas tarefas de forma simples e eficiente!</p></h1>
+        <h1>Gerenciador de Tarefas | <p class="org">Organize suas tarefas de forma simples e eficiente!</p></h1>
         <section class="task-search">
             <input type="text" id="searchInput" placeholder="Pesquise uma tarefa" />
         </section>
@@ -16,12 +17,28 @@
     <main>
         <section class="task-input">
             <input type="text" id="taskInput" placeholder="Adicione uma nova tarefa" />
+            <input type="datetime-local" id="dateInput">
             <button id="addTaskBtn">Adicionar</button>
         </section>
       
+        <section class="task-counters">
+            <p>Tarefas por fazer: <span id="pendingCount">0</span></p>
+            <p>Tarefas feitas: <span id="completedCount">0</span></p>
+            <p>Tarefas atrasadas: <span id="overdueCount">0</span></p>
+        </section>
+
         <section class="task-list">
-            <h2>Minhas Tarefas</h2>
-            <ul id="taskList"></ul>
+
+            <div id="taskLists">
+                <h2>Tarefas Por Fazer</h2>
+                <ul id="pendingTasks"></ul>
+            
+                <h2>Tarefas Concluídas</h2>
+                <ul id="completedTasks"></ul>
+            
+                <h2>Tarefas Atrasadas</h2>
+                <ul id="overdueTasks"></ul>
+            </div>
         </section>
     </main>
     <footer>

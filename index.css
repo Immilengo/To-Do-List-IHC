@@ -131,3 +131,21 @@ main {
 .org{
     font-size: small;
 }
+
+.message-box {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    opacity: 0.9;
+}
+.message-box.error {
+    background-color: #dc3545;
+}
